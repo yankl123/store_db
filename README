@@ -1,0 +1,44 @@
+
+#project name:
+    "store_db"
+
+#defenition
+    hendl store debts 
+#language
+    c
+####################################################
+#arcitecture 
+    store.h :
+        Engaged in philosophy of store : data struct ,compair data and validate 
+#       revealing sevaral functions to store.db (signature)
+
+        /\
+        ||
+#       store.c:
+#       implementing all function to handl data
+
+#       /\
+#       ||
+#       store_db.c:
+#       handle the database reading frome debts.csv
+#       
+        ||  
+        \/ 
+#       store_db.h:
+#       revealing the "database" function to main (signature)
+        /\
+        ||
+#       main:
+            accse to dadabase 
+#       debts.CSV
+            the database file
+
+#   how to use
+#       make : compile basic
+#       make run : run
+#       make debug : debug with gdb
+#       cleen : cleen ol object file       
+
+
+    
+
