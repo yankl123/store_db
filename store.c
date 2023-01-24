@@ -121,11 +121,11 @@ int incondition(client *node,char *what ,int(*compair)(client*,char*) ,char c)
     return 0 ;
 }
 
-int ispos_nome(char *num_str)
+int ispos_nume(char *num_str)
 {
     for (int i = 0; i < strlen(num_str); i++)
     {
-        if (num_str[i] > 48 && num_str[i] > 57)
+        if (!(num_str[i] > 47 && num_str[i] < 58))
         {
             return 0 ;
         } 
@@ -133,7 +133,7 @@ int ispos_nome(char *num_str)
     return 1 ;
 }
 
-int valid_name(char *name)
+unsigned int valid_name(char *name)
 {
     int len = strlen(name) ;
     char shtuyot[45] ;
@@ -147,7 +147,7 @@ int valid_name(char *name)
 }
 
 
-int valid_Sname(char *sname)
+unsigned int valid_Sname(char *sname)
 {
     if (!valid_name(sname))
     {
@@ -157,7 +157,7 @@ int valid_Sname(char *sname)
 }
 
 
-int valid_id(unsigned int id)
+unsigned int valid_id(unsigned int id)
 {
    if (id < 1 || id > 999999999)
    {
@@ -167,17 +167,16 @@ int valid_id(unsigned int id)
 }
 
 
-int valid_pohne(char *phone)
+unsigned int valid_pohne(char *phone)
 {
-    if (strlen(phone) != 10 || phone[0] != '0')
+    if (!ispos_nume(phone)|| strlen(phone) != 10 || phone[0] != '0')
     {
         return 0 ;
     }
-    
     return POHNE ;
 }
 
-int valid_date(char *dt_str)
+unsigned int valid_date(char *dt_str)
 {
     int x = date_code(dt_str) ;
     if(!x)
@@ -187,7 +186,7 @@ int valid_date(char *dt_str)
     return DATE ;
 }
 
-int valid_debt(float debt)
+unsigned int valid_debt(float debt)
 {
     if(!debt)
     {
@@ -196,7 +195,42 @@ int valid_debt(float debt)
     return DEBT ;
 }
 
-// int valid_()
-// {
-//     return 0 ;
-// }
+int valid_all(client *clt ,int line)
+{
+    unsigned char all_valid = 1 << 6 ; //11000000
+    char *ermsg[6] = {
+        "\tinvalide first name : Strange letters\n",
+        "\tinvalide first name : Strange letters\n",
+        "\tinvalid id : must be number int range 1-999999999\n",
+        "\tinvalide phone number :must be number with length 10 and first number 0\n",
+        "\tinvalid debt sum must be a number GREATE OR LOWER then 0"
+        "\tinvalide date :\n",
+    } ;
+    all_valid |= valid_name(clt->first_name) ;
+    all_valid |= valid_Sname(clt->second_name) ;
+    all_valid |= valid_id(clt->id) ;
+    all_valid |= valid_pohne(clt->phone) ;
+    all_valid |= valid_pohne(clt->last_date) ;
+    all_valid |= valid_debt(clt->dept_sum) ;
+    if (all_valid == 255)
+    {
+        return 1 ;
+    }
+    else
+    {
+        printf("found error id data of line %d\n" ,line) ;
+        for (int i = 0; i < FILD_COUNT; i++)
+        {
+            if(!(all_valid & all_valid))
+            {
+                puts(ermsg[i]) ;
+            }
+            
+        } 
+        return 0 ;
+    }
+    
+   
+
+
+}
