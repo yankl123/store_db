@@ -123,10 +123,22 @@ int set_new(client **head ,client *new ,int line)
         if(curent->id == new->id)
         {
             curent->dept_sum += new->dept_sum ;
+            if(!(!strcpy(curent->first_name ,new->first_name) && !strcpy(curent->second_name,new->second_name)))
+            {
+                printf("conflict ! in line %d : same id but not same name\n",line);
+                return -1 ;
+            }
+            
             strcpy(curent->last_date,new->last_date) ;
             strcpy(curent->phone,new->phone) ;
+
             code = 1 ;
             break;
+        }
+        else if ((!strcpy(curent->first_name ,new->first_name) && !strcpy(curent->second_name,new->second_name)))
+        {
+            printf("conflict ! in line %d : same name but not same id\n",line);
+            return -1 ;
         }
         prev = curent ;
         curent = curent->next ;
