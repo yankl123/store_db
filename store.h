@@ -20,7 +20,7 @@ typedef struct client {
     struct client *next ;
 
 }client;
-
+int valid_all(client *clt ,int line) ;
 int compair_fname(client *node ,char *name) ;
 int compair_sname(client *node ,char *what) ;
 int compair_id(client *node ,char *what);

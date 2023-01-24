@@ -84,16 +84,38 @@ void insertSorted(client **Head, client *node)
     *Next = node;
 }
 
-void set_new(client **head ,client *new)
+void free_one(client *clt)
+{
+    free(clt->first_name) ;
+    free(clt->second_name) ;
+    free(clt) ;
+}
+
+void free_db(client *node)
+{
+    while (node)
+    {
+        client *tmp = node ;
+        node = node->next ;
+        free_one(tmp) ;
+    }
+    
+}
+int set_new(client **head ,client *new ,int line)
 {
     client *curent = *head ;
     client *prev = NULL ;
+    int code ;
 
-
+    if (!valid_all(new ,line))
+    {
+        return -1 ;
+    }
+    
     if (!(*head))
     {
        *head = new ;
-       return ;
+       return 0 ;
     }
     
     while (curent)
@@ -102,9 +124,8 @@ void set_new(client **head ,client *new)
         {
             curent->dept_sum += new->dept_sum ;
             strcpy(curent->last_date,new->last_date) ;
-            free(new->first_name) ;
-            free(new->second_name) ;
-            free(new) ;
+            strcpy(curent->phone,new->phone) ;
+            code = 1 ;
             break;
         }
         prev = curent ;
@@ -115,17 +136,18 @@ void set_new(client **head ,client *new)
     {
         *head = curent->next ;
         insertSorted(head,curent) ;
-        return ;
+        return  1 ;
     }
 
     if (!curent)
     {   
+        code = 0 ;
         curent = new ;
     }
 
     prev->next = curent->next ;
     insertSorted(head,curent) ;
-    
+    return code ;
 }
 
 
@@ -226,7 +248,12 @@ void orgenize_db(char *file_name ,client **db_head)
         new = parse(line,counter) ;
         if(new)
         {
-            set_new(&head,new) ;
+            int x =  set_new(&head,new,counter);
+            if (x != 0)
+            {
+                free_one(new) ;
+            }
+            
         }
     }
     *db_head = head ;
@@ -471,13 +498,21 @@ void database(char *file_name)
            }
            if(all_filds == 255)
            {
-                fprintf(file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
-                printf("%u\n" ,(unsigned int)~all_filds) ;
                 show_one(new) ;
-                set_new(&db_head, new) ;
+                int x = set_new(&db_head, new ,0) ;
+                if(x > -1)
+                {
+                    fprintf(file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
+                }
+
+                if (x != 0)
+                {
+                    free_one(new) ;
+                }
            }
            else
            {
+                free_one(new) ;
                 for (i = 0; i < FILD_COUNT; i++)
                 {
                     if (!(all_filds & fld[i]))

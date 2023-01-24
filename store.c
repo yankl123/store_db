@@ -19,7 +19,7 @@ unsigned int date_code(const char *date_string)
         }
     }
     v = sscanf(date_str,"%u %u %u", &day ,&month ,&yare) ;
-    if (v != 3 || !(day > 0 && day < 32) || !(month > 0 && month < 13) || !(yare < 1970 && yare > 2024)) 
+    if (v != 3 || !(day > 0 && day < 32) || !(month > 0 && month < 13) || !(yare > 1970 && yare < 2024)) 
     {
         return 0 ;
     }
@@ -157,9 +157,9 @@ unsigned int valid_Sname(char *sname)
 }
 
 
-unsigned int valid_id(unsigned int id)
+unsigned int valid_id(int id)
 {
-   if (id < 1 || id > 999999999)
+   if (!id)
    {
         return 0 ;
    }
@@ -186,9 +186,9 @@ unsigned int valid_date(char *dt_str)
     return DATE ;
 }
 
-unsigned int valid_debt(float debt)
+unsigned int valid_debt(float debt, int line)
 {
-    if(!debt)
+    if(!debt && line == 0)
     {
         return 0 ;
     }
@@ -197,31 +197,34 @@ unsigned int valid_debt(float debt)
 
 int valid_all(client *clt ,int line)
 {
-    unsigned char all_valid = 1 << 6 ; //11000000
+    unsigned char all_valid = (3 << 6) ; //11000000
+    enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DATE,DEBT} ;
     char *ermsg[6] = {
         "\tinvalide first name : Strange letters\n",
         "\tinvalide first name : Strange letters\n",
         "\tinvalid id : must be number int range 1-999999999\n",
         "\tinvalide phone number :must be number with length 10 and first number 0\n",
-        "\tinvalid debt sum must be a number GREATE OR LOWER then 0"
-        "\tinvalide date :\n",
+        "\tinvalid debt sum must be a number GREATE OR LOWER then 0\n",
+        "\tinvalide date :\n"
     } ;
+
     all_valid |= valid_name(clt->first_name) ;
     all_valid |= valid_Sname(clt->second_name) ;
     all_valid |= valid_id(clt->id) ;
     all_valid |= valid_pohne(clt->phone) ;
-    all_valid |= valid_pohne(clt->last_date) ;
-    all_valid |= valid_debt(clt->dept_sum) ;
+    all_valid |= valid_debt(clt->dept_sum,line) ;
+    all_valid |= valid_date(clt->last_date) ;
+  
     if (all_valid == 255)
     {
         return 1 ;
     }
     else
     {
-        printf("found error id data of line %d\n" ,line) ;
+        printf("found error in data of line %d\n" ,line) ;
         for (int i = 0; i < FILD_COUNT; i++)
         {
-            if(!(all_valid & all_valid))
+            if(!(all_valid & fld[i] ))
             {
                 puts(ermsg[i]) ;
             }

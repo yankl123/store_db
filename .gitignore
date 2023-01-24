@@ -1,4 +1,4 @@
 \*.o
 .vscode
 main
-wget-log
+wget_log
