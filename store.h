@@ -13,7 +13,7 @@ enum filds{
 typedef struct client {
     char *first_name ;
     char *second_name ;
-    unsigned int id ;
+    int id ;
     char phone[10] ;  
     float dept_sum ;
     char last_date[12] ; 

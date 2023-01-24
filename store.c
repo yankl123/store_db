@@ -133,3 +133,70 @@ int ispos_nome(char *num_str)
     return 1 ;
 }
 
+int valid_name(char *name)
+{
+    int len = strlen(name) ;
+    char shtuyot[45] ;
+    sscanf(name,"%[^\'^\"^%^{^}^;^[^]\\^?^=^]",shtuyot) ;
+    if (len > strlen(shtuyot))
+    {
+       return 0 ;
+    }
+    
+    return FIRST_NAME ;
+}
+
+
+int valid_Sname(char *sname)
+{
+    if (!valid_name(sname))
+    {
+        return 0 ;
+    }
+    return SECOND_NAME ;
+}
+
+
+int valid_id(unsigned int id)
+{
+   if (id < 1 || id > 999999999)
+   {
+        return 0 ;
+   }
+   return ID ;
+}
+
+
+int valid_pohne(char *phone)
+{
+    if (strlen(phone) != 10 || phone[0] != '0')
+    {
+        return 0 ;
+    }
+    
+    return POHNE ;
+}
+
+int valid_date(char *dt_str)
+{
+    int x = date_code(dt_str) ;
+    if(!x)
+    {
+        return 0 ;
+    }
+    return DATE ;
+}
+
+int valid_debt(float debt)
+{
+    if(!debt)
+    {
+        return 0 ;
+    }
+    return DEBT ;
+}
+
+// int valid_()
+// {
+//     return 0 ;
+// }

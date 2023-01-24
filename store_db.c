@@ -173,7 +173,7 @@ client *parse(char *line ,int line_number)
 
 void show_one(client *head)
 {
-     printf("%s %s %u %s %f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
+     printf("%s %s %d %s %f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
 }
 
 void show_db(client *head)
@@ -326,7 +326,7 @@ void database(char *file_name)
         int x = 0 ;
         char *fild_nams[6] ={"first name","second name" ,"id" ,"phone" ,"date" ,"debt"} ;
         enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DATE,DEBT} ;
-        printf("Please enter the comand (select ,set ,show)--> ") ;
+        printf("Please enter the comand (select ,set ,show ,or 'quit' to exit)--> ") ;
         
         fgets(query_string,300,stdin) ;
         
@@ -471,7 +471,7 @@ void database(char *file_name)
            }
            if(all_filds == 255)
            {
-                fprintf(file,"%s,%s,%u,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
+                fprintf(file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
                 printf("%u\n" ,(unsigned int)~all_filds) ;
                 show_one(new) ;
                 set_new(&db_head, new) ;
