@@ -516,7 +516,6 @@ void database(char *file_name)
                 {
                     fprintf(file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
                 }
-
                 if (x != 0)
                 {
                     free_one(new) ;
@@ -541,7 +540,7 @@ void database(char *file_name)
         }
     }
     fclose(file) ;
-   
+    free_db(db_head) ;
 }
 
 
