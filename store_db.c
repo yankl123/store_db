@@ -122,8 +122,7 @@ int set_new(client **head ,client *new ,int line)
     {
         if(curent->id == new->id)
         {
-            curent->dept_sum += new->dept_sum ;
-            if(!(!strcpy(curent->first_name ,new->first_name) && !strcpy(curent->second_name,new->second_name)))
+            if(!(!strcmp(curent->first_name ,new->first_name) && !strcmp(curent->second_name,new->second_name)))
             {
                 printf("conflict ! in line %d : same id but not same name\n",line);
                 return -1 ;
@@ -131,11 +130,11 @@ int set_new(client **head ,client *new ,int line)
             
             strcpy(curent->last_date,new->last_date) ;
             strcpy(curent->phone,new->phone) ;
-
+            curent->dept_sum += new->dept_sum ;
             code = 1 ;
             break;
         }
-        else if ((!strcpy(curent->first_name ,new->first_name) && !strcpy(curent->second_name,new->second_name)))
+        else if((!strcmp(curent->first_name ,new->first_name) && !strcmp(curent->second_name,new->second_name)))
         {
             printf("conflict ! in line %d : same name but not same id\n",line);
             return -1 ;
@@ -207,7 +206,7 @@ client *parse(char *line ,int line_number)
 
 void show_one(client *head)
 {
-     printf("%s %s %d %s %f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
+     printf("%s  %s  %d  %s %f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
 }
 
 void show_db(client *head)
