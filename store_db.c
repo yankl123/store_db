@@ -211,6 +211,7 @@ void show_one(client *head)
 
 void show_db(client *head)
 {   
+    printf("first name | second name|  id | phone | date | debt\n\n") ;
     client *clt = head ;
     while (clt)
     {
@@ -349,13 +350,16 @@ void database(char *file_name)
     orgenize_db(file_name,&db_head) ;
     show_db(db_head) ;
     printf("\n") ;
-    
-    
+    printf("type your comand\n\nselect : <FILD> <OPERTOR (= > < !=)\n\t" );
+    printf("optional filds : first name ,second name, id ,phone ,date ,debt\n") ;
+    printf("set :\n\t:<FILD> = <PARMETE> ,<FILD> = <PARMETE> ,<FILD> = <PARMETE> ...for all filds\n\n") ;
+    printf("for exit type 'quit' , for show the database type 'show'\n") ;
+    printf("\n ") ;
     while (1)
     {
         char query_string[1024] ={0};
         char q_type[10]         ={0};
-        char expretion[1000]    ={0};
+        char expretion[1000]    ={0} ;
         char c ;
         char op1[20] = {0};
         char op2[50] = {0} ;
