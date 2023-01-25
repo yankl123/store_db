@@ -16,8 +16,8 @@
         ||
 #       store.c:
 #       implementing all function to handl data
-
-#       /\
+    /\
+#   ||____
 #       ||
 #       store_db.c:
 #       handle the database reading frome debts.csv
