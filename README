@@ -20,7 +20,7 @@
 #   ||____
 #       ||
 #       store_db.c:
-#       handle the database reading frome debts.csv
+#       handle the database reading from debts.csv
 #       
         ||  
         \/ 
@@ -37,7 +37,7 @@
 #       make : compile basic
 #       make run : run
 #       make debug : debug with gdb
-#       cleen : cleen ol object file       
+#       clean : cleen all object file       
 
 
     
