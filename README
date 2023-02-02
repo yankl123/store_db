@@ -16,20 +16,25 @@
         ||
 #       store.c:
 #       implementing all function to handl data
-    /\
-#   ||____
-#       ||
+
+#           string_handl.c
+#           string_handl.h 
+#   /\          /\
+#   ||__________||        
 #       store_db.c:
-#       handle the database reading from debts.csv
+#       handle the database reading from debts.csv  --->   
 #       
         ||  
         \/ 
 #       store_db.h:
-#       revealing the "database" function to main (signature)
+
+#       revealing the database functions to main_local (signature)
+#
         /\
         ||
 #       main:
-            accse to dadabase 
+            intial database 
+            user interface
 #       debts.CSV
             the database file
 
@@ -37,7 +42,7 @@
 #       make : compile basic
 #       make run : run
 #       make debug : debug with gdb
-#       clean : cleen all object file       
+#       clean : clean all object file       
 
 
     

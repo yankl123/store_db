@@ -23,7 +23,7 @@ unsigned int date_code(const char *date_string)
     {
         return 0 ;
     }
-    
+
     date |= yare << 9 ;
     date |= month << 5 ;
     date |= day ; 
@@ -92,8 +92,6 @@ int compair_date(client *node ,char *what)
         return 0 ;
     }
     return (x < y) ?  -1 : 1 ;
-   
-    
 }
 int incondition(client *node,char *what ,int(*compair)(client*,char*) ,char c) 
 {
@@ -128,7 +126,7 @@ int ispos_nume(char *num_str)
         if (!(num_str[i] > 47 && num_str[i] < 58))
         {
             return 0 ;
-        } 
+        }
     }
     return 1 ;
 }
@@ -146,7 +144,6 @@ unsigned int valid_name(char *name)
     return FIRST_NAME ;
 }
 
-
 unsigned int valid_Sname(char *sname)
 {
     if (!valid_name(sname))
@@ -156,7 +153,6 @@ unsigned int valid_Sname(char *sname)
     return SECOND_NAME ;
 }
 
-
 unsigned int valid_id(int id)
 {
    if (!id)
@@ -165,7 +161,6 @@ unsigned int valid_id(int id)
    }
    return ID ;
 }
-
 
 unsigned int valid_pohne(char *phone)
 {
@@ -186,33 +181,35 @@ unsigned int valid_date(char *dt_str)
     return DATE ;
 }
 
-unsigned int valid_debt(float debt, int line)
+unsigned int valid_debt(float debt)
 {
-    if(!debt && line == 0)
+    if(!debt)
     {
         return 0 ;
     }
     return DEBT ;
 }
 
-int valid_all(client *clt ,int line)
+int valid_all(client *clt ,int line,char *err_buf)
 {
     unsigned char all_valid = (3 << 6) ; //11000000
-    enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DATE,DEBT} ;
+    enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DEBT,DATE} ;
     char *ermsg[6] = {
         "\tinvalide first name : Strange letters\n",
-        "\tinvalide first name : Strange letters\n",
+        "\tinvalide second name : Strange letters\n",
         "\tinvalid id : must be number int range 1-999999999\n",
         "\tinvalide phone number :must be number with length 10 and first number 0\n",
         "\tinvalid debt sum must be a number GREATE OR LOWER then 0\n",
-        "\tinvalide date :\n"
+         "\tinvalide date :\n",
+        
     } ;
+    char error_str[500] = {0};
 
     all_valid |= valid_name(clt->first_name) ;
     all_valid |= valid_Sname(clt->second_name) ;
     all_valid |= valid_id(clt->id) ;
     all_valid |= valid_pohne(clt->phone) ;
-    all_valid |= valid_debt(clt->dept_sum,line) ;
+    all_valid |= valid_debt(clt->dept_sum) ;
     all_valid |= valid_date(clt->last_date) ;
   
     if (all_valid == 255)
@@ -221,19 +218,23 @@ int valid_all(client *clt ,int line)
     }
     else
     {
-        printf("found error in data of line %d\n" ,line) ;
+        sprintf(error_str,"found error in data of line %d\n" ,line) ;
         for (int i = 0; i < FILD_COUNT; i++)
         {
-            if(!(all_valid & fld[i] ))
+            if(!(all_valid & fld[i]))
             {
-                puts(ermsg[i]) ;
+                strcat(error_str ,ermsg[i]) ;
             }
-            
         } 
+        if (err_buf)
+        {
+            strcpy(err_buf,error_str) ;
+        }
+        else
+        {
+            puts(error_str) ;
+        }
         return 0 ;
     }
-    
-   
-
 
 }

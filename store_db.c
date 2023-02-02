@@ -1,76 +1,5 @@
-#include "store.h" 
 #include "store_db.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-// #define FILE_NAME "depts.CSV" //option
-
-
-// int check_validtion(char *line)
-// {
-//     return 1 ;quit
-// }
-void trim(char *s)
-{
-    int i= 0 ;
-    int j = strlen(s) -1;
-    int x ;
-    int tmp ;
-    while (s[i] && (s[i] == ' ' || s[i] == '\t'))
-    {
-        i++ ;
-    }
-    if(!s[i])
-    {
-        s[0] = '\0' ;
-        return ;
-    }
-    while ((s[j] == ' ' || s[j] == '\t' || s[j] == '\n'))
-    {
-        s[j] = '\0' ;
-        j-- ;
-    } 
-    tmp = i ;
-    i = 0 ;
-    x = strlen(s) ;
-    while (i <= x)
-    {
-       s[i] = s[tmp] ;
-       i++ ;
-       tmp ++ ;
-    }  
-}
-
-void rm_ex_wtspace(char *str)
-{
-    int len = strlen(str);
-    for(int i=0; i<len; i++)
-    {
-        if((str[i] == 32 && str[i+1]==32) || (str[i]=='\t' && str[i+1]=='\t') )
-        {
-            for(int j=i; j<(len-1); j++)
-            {
-                str[j] = str[j+1];
-            }
-            len--;
-            str[len]='\0';
-            i = 0;
-        }
-    }
-
-}
-
-
-void lower(char *str)
-{
-    for(int i=0;i<=strlen(str);i++)
-    {
-        if(str[i]>=65&&str[i]<=90)
-        {
-            str[i]=str[i]+32;
-        }
-    }
-}
+#include "string_handl.h"
 
 void insertSorted(client **Head, client *node)
 {
@@ -86,8 +15,14 @@ void insertSorted(client **Head, client *node)
 
 void free_one(client *clt)
 {
-    free(clt->first_name) ;
-    free(clt->second_name) ;
+    if (clt->first_name)
+    {
+        free(clt->first_name) ;
+    }
+    if (clt->second_name)
+    {
+        free(clt->second_name) ;
+    }
     free(clt) ;
 }
 
@@ -101,13 +36,13 @@ void free_db(client *node)
     }
     
 }
-int set_new(client **head ,client *new ,int line)
+int set_new(client **head ,client *new ,int line,char *er_buf)
 {
     client *curent = *head ;
     client *prev = NULL ;
     int code ;
-
-    if (!valid_all(new ,line))
+    char er_line[50] = {0} ;
+    if (!valid_all(new ,line,er_buf))
     {
         return -1 ;
     }
@@ -124,7 +59,12 @@ int set_new(client **head ,client *new ,int line)
         {
             if(!(!strcmp(curent->first_name ,new->first_name) && !strcmp(curent->second_name,new->second_name)))
             {
-                printf("conflict ! in line %d : same id but not same name\n",line);
+                sprintf(er_line,"conflict ! in line %d : same id but not same name\n",line);
+                if (er_buf)
+                {
+                    strcpy(er_buf,er_line) ;
+                }
+                puts(er_line) ;
                 return -1 ;
             }
             
@@ -136,7 +76,16 @@ int set_new(client **head ,client *new ,int line)
         }
         else if((!strcmp(curent->first_name ,new->first_name) && !strcmp(curent->second_name,new->second_name)))
         {
-            printf("conflict ! in line %d : same name but not same id\n",line);
+            sprintf(er_line,"conflict ! in line %d : same name but not same id\n",line);
+            if (er_buf)
+            {
+                strcpy(er_buf,er_line) ;
+            }
+            else
+            {
+                puts(er_line) ;
+            }
+            
             return -1 ;
         }
         prev = curent ;
@@ -160,8 +109,6 @@ int set_new(client **head ,client *new ,int line)
     insertSorted(head,curent) ;
     return code ;
 }
-
-
 
 client *parse(char *line ,int line_number)
 {
@@ -200,51 +147,53 @@ client *parse(char *line ,int line_number)
     new->next = NULL ;
 
     return new ;
-
 }
 
-
-void show_one(client *head)
+void insert_to_buf(client *head,char *buf ,void(*target)(char*,void*),void *props)
 {
-     printf("%s  %s  %d  %s %f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
+    char line[120] = {0} ;
+    sprintf(line ,"%-25s %-25s %09d        %-15s %-15f %s\n",head->first_name,head->second_name,head->id ,head->phone ,head->dept_sum ,head->last_date) ;
+    if (BUFER_SIZE - strlen(buf) <= strlen(line))
+    {
+        target(buf,props) ;
+        memset(buf,0,BUFER_SIZE) ;
+    }
+    strcat(buf,line) ;
 }
 
-void show_db(client *head)
+void show_db(client *head,char *buf ,void(*target)(char*,void*) ,void *props)
 {   
-    printf("first name | second name|  id | phone | date | debt\n\n") ;
     client *clt = head ;
     while (clt)
     {
-        show_one(clt) ;
+        insert_to_buf(clt,buf,target,props) ;
         clt = clt->next ;
     }
 }
 
-void show_if(client *head ,char *what ,int(*compair)(client *node,char *oprand), char op )
+void show_if(client *head ,select_props sp,int(*compair)(client *node,char *oprand),char *buf ,void(*target)(char*,void*),void *props)
 {
     int x ;
     int found = 0 ;
     while (head)
     {
-        x = incondition(head,what,compair,op) ;
+        x = incondition(head,sp.option,compair,sp.operator) ;
         if(x)
         {
             found = 1 ;
-            show_one(head) ;
+            insert_to_buf(head,buf,target,props) ;
         }
         head = head->next ;
     } 
     if(!found)
     {
-        puts("not found") ;
+        strcat(buf,"not found\n") ;
     }
 }
 
-void orgenize_db(char *file_name ,client **db_head)
+void orgenize_db(FILE *file,client **db_head)
 {
     client *head = NULL;
-    FILE *file ;
-    file = fopen(file_name,"r") ;
     int counter = 0 ;
     while (1)
     {
@@ -260,290 +209,289 @@ void orgenize_db(char *file_name ,client **db_head)
         new = parse(line,counter) ;
         if(new)
         {
-            int x =  set_new(&head,new,counter);
+            int x =  set_new(&head,new,counter,NULL);
             if (x != 0)
             {
                 free_one(new) ;
             }
-            
         }
     }
     *db_head = head ;
-    fclose(file) ;
 } 
 
-int db_select(client *head, enum filds op1 ,char operator ,char *op2)
+void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *buf ,void *props)
 {
     int found = 0 ;
-    switch (op1)
+    switch (sp.fild)
     {
     case FIRST_NAME:
-        show_if(head,op2,compair_fname,operator) ;
+        show_if(head,sp,compair_fname,buf,target,props) ;
         break;
     case SECOND_NAME:
-        show_if(head,op2,compair_sname,operator) ;
+        show_if(head,sp,compair_sname,buf,target,props) ;
         break;  
     case ID:
-        show_if(head,op2,compair_id,operator) ;
+        show_if(head,sp,compair_id,buf,target,props) ;
         break;
     case POHNE:
-         show_if(head,op2,compair_phone,operator) ;
+        show_if(head,sp,compair_phone,buf,target,props) ;
         break;   
     case DATE:
-        show_if(head,op2,compair_date,operator) ;
+        show_if(head,sp,compair_date,buf,target,props) ;
         break;
     case DEBT: //slightly long but save run time...
-        if( operator == '!')
+        if(sp.operator == '!')
         {
-            show_if(head,op2,compair_debt,operator) ;
+            show_if(head,sp,compair_debt,buf,target,props) ;
             break;
         }
         while (head)
         {
-            float dbt = (float)atof(op2) ;
+            float dbt = (float)atof(sp.option) ;
             if(head->dept_sum > dbt) 
             {
-                if (operator == '>')
+                if (sp.operator == '>')
                 {
-                    show_db(head) ;
+                    show_db(head,buf,target,NULL) ;
                 }
                 else
                 {
-                    (found) ? printf(" \b") : printf("not found");
+                    if (!found)
+                    {
+                       strcat(buf,"not found\n") ;
+                    } 
                 }
                 break;
             }
-            else if(head->dept_sum == dbt && operator != '>')
+            else if(head->dept_sum == dbt && sp.operator != '>')
             {
-                if(operator == '<') 
+                if(sp.operator == '<') 
                 {
-                    (found) ? printf(" \b") : printf("not found");
+                    if (!found)
+                    {
+                       strcat(buf,"not found\n") ;
+                    } 
                     break;
                 }
-                show_one(head) ;
+                insert_to_buf(head,buf,target,NULL) ;
                 found = 1 ;
             }
-            else if((operator == '<'))
+            else if((sp.operator == '<'))
             {
-                show_one(head) ;
+                insert_to_buf(head,buf,target,NULL) ;
                 found = 1 ;
             }
             head = head->next ;
             if (!head && !found)
             {
-                puts("not found") ;
+                strcat(buf,"not found\n") ;
             }   
         }
         break;
     default: 
         break;
     }
-    return found ;
 }
-
-void database(char *file_name)
+after_pars parse_query(char *q_str)
 {
-    printf("WELCOM TO STORE DATABASE\n\n") ;
-    client *db_head = NULL;
-    FILE *file ; 
-    file = fopen(file_name,"a+") ;
-    orgenize_db(file_name,&db_head) ;
-    show_db(db_head) ;
-    printf("\n") ;
-    printf("type your comand\n\nselect : <FILD> <OPERTOR (= > < !=)\n\t" );
-    printf("optional filds : first name ,second name, id ,phone ,date ,debt\n") ;
-    printf("set :\n\t:<FILD> = <PARMETE> ,<FILD> = <PARMETE> ,<FILD> = <PARMETE> ...for all filds\n\n") ;
-    printf("for exit type 'quit' , for show the database type 'show'\n") ;
-    printf("\n ") ;
-    while (1)
-    {
-        char query_string[1024] ={0};
-        char q_type[10]         ={0};
-        char expretion[1000]    ={0} ;
-        char c ;
-        char op1[20] = {0};
-        char op2[50] = {0} ;
-        const char d[2] = ",";
-        int i ;
-        int x = 0 ;
-        char *fild_nams[6] ={"first name","second name" ,"id" ,"phone" ,"date" ,"debt"} ;
-        enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DATE,DEBT} ;
-        printf("Please enter the comand (select ,set ,show ,or 'quit' to exit)--> ") ;
-        
-        fgets(query_string,300,stdin) ;
-        
-        if(query_string[strlen(query_string)- 1] == '\n')
-        {
-            query_string[strlen(query_string)- 1] = 0 ;
-        }
-        lower(query_string) ;
-        rm_ex_wtspace(query_string);
-        trim(query_string) ;
-        puts(expretion) ;
-        x = sscanf(query_string ,"%9s %1000[^\t]", q_type,expretion) ;
+    after_pars af_pars = {} ;
+    char q_type[10] ={ 0} ;
+    char expretion[1000] = {0} ;
+    char c ;
+    char op1[20] = {0};
+    char op2[25] = {0} ;
+    const char d[2] = ",";
+    int i ;
+    int x = 0 ;
+    char *fild_nams[6] ={"first name","second name" ,"id" ,"phone","debt","date" } ;
+    enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DEBT,DATE} ;
 
-        if(!strcmp(q_type,"quit"))
+    if(q_str[strlen(q_str)- 1] == '\n')
+    {
+        q_str[strlen(q_str)- 1] = 0 ;
+    }
+        lower(q_str) ;
+        rm_ex_wtspace(q_str);
+        trim(q_str) ;
+
+    x = sscanf(q_str ,"%9s %1000[^\t]", q_type,expretion) ;
+
+    if (!strcmp(q_type,"quit"))
+    {
+        af_pars.q_type = QUIT ;
+    }
+    else if(!strcmp(q_type,"select"))
+    {
+        for (i = 0; i < strlen(expretion) -1; i++)
         {
-           break;
-        }
-        else if (!strcmp(q_type,"show"))
-        {
-            show_db(db_head) ;
-        }
-        else if(x < 2)
-        {
-            puts("invalid syntsx ! syntax : COMAND < FILD >  < OPERATOR (> , < , = ,!=) > < PARAMETER > ") ;
-            continue;
-        }
-        else if (!strcmp(q_type,"select"))
-        {
-            for (i = 0; i < strlen(expretion) -1; i++)
+            c = expretion[i] ;
+            if(c == '=' || c == '<' || c == '>' ||(c == '!' && expretion[i+1] == '=' && expretion[i+2] ))  
             {
-                c = expretion[i] ;
-                if(c == '=' || c == '<' || c == '>' ||(c == '!' && expretion[i+1] == '=' && expretion[i+2] ))  
+                if ((c == '!'))
                 {
-                    if ((c == '!'))
-                    {
-                        expretion[i+1] = '\t' ;
-                    }
+                    expretion[i+1] = '\t' ;
+                }
+                break;
+            }
+        }
+
+        if ( i == strlen(expretion) -1)
+        {
+            af_pars.q_type = ERROR ;
+            strcpy(af_pars.error_str,"Error !. syntax : < FILD >  < OPERATOR (> , < , = ,!=) > < PARAMETER >") ;
+            return af_pars ;
+        }
+
+        sscanf(expretion,"%19[^=^!^>^<] %24[^\n]" ,op1 ,op2);
+        op2[0] = '\t' ;
+        trim(op1) ;
+        trim(op2) ;
+
+        for (i = 0; i < FILD_COUNT; i++)
+        {
+            if(!strcmp(fild_nams[i] ,op1))
+            {
+                af_pars.sp.fild = fld[i] ;
+                af_pars.q_type = SELECT ;
+                af_pars.sp.operator = c ;
+                strcpy(af_pars.sp.option , op2) ;
+                break ;
+            }
+        }
+        if (i == FILD_COUNT)
+        {
+            printf("Error: Unknown type %s\n" ,op1) ;
+        }
+    }
+    else if(!strcmp(q_type,"set"))
+    {
+        unsigned char all_filds =  (3 << 6) ; // 11000000 
+        client *new = malloc(sizeof(client)) ;
+
+        if(!new)
+        {
+            puts("Problem.. can't allocte memery") ;
+            af_pars.q_type = ERROR ;
+            strcpy(af_pars.error_str,"A problem occurred in the database\n") ;
+            return af_pars ;
+        }
+        new->next = NULL ;
+        new->first_name = NULL ;
+        new->second_name = NULL ;
+        char *exp = NULL ;
+
+        exp = strtok(expretion,d) ;
+            
+        for (int ex = 0; ex < FILD_COUNT; ex++)
+        {
+            if (!exp)
+            {
+                af_pars.q_type = ERROR ;
+                strcpy(af_pars.error_str,"Erorr : mising filds.. cont add data to database\n") ;
+                return af_pars ;
+            }
+            
+            for (i = 0; i < strlen(exp) -1 ; i++)
+            {
+                c = exp[i] ;
+                if(c == '=') 
+                {
                     break;
                 }
             }
-
-
-            if ( i == strlen(expretion) -1)
+            
+            if ( i == strlen(exp)-1)
             {
-                puts("Error ! syntax : < FILD >  < OPERATOR (> , < , = ,!=) > < PARAMETER >") ;
-                continue;
-            }
-
-            sscanf(expretion,"%19[^=^!^>^<] %49[^\n]" ,op1 ,op2);
+                af_pars.q_type = ERROR ;
+                sprintf(af_pars.error_str ,"Error : invalid operator %c . options : > , < = , != ", c) ;
+                return af_pars ;
+            } 
+            
+            sscanf(exp,"%19[^=] %24[^\t]" ,op1 ,op2);
             op2[0] = '\t' ;
             trim(op1) ;
             trim(op2) ;
-            
-            for (i = 0; i < FILD_COUNT; i++)
+
+            if(!strcmp("first name" ,op1))
             {
-                if(!strcmp(fild_nams[i] ,op1))
-                {
-                    db_select(db_head,fld[i],c,op2) ;
-                    break;
-                }
+                new->first_name = strdup(op2)  ;
+                all_filds |= FIRST_NAME;
             }
-
-            if (i == FILD_COUNT)
+            else if (!strcmp("second name" ,op1))
             {
-                printf("Error Unknown type %s\n" ,op1) ;
+                new->second_name = strdup(op2) ;
+                all_filds |= SECOND_NAME;
             }
-            
-        }
-        else if(!strcmp(q_type,"set"))
-        {
-           unsigned char all_filds =  (3 << 6) ; // 11000000 
-           client *new = malloc(sizeof(client)) ;
-           new->next = NULL ;
-           char *exp = NULL;
-
-           exp = strtok(expretion,d) ;
-            
-           for (int ex = 0; ex < FILD_COUNT; ex++)
-           {
-                if (!exp)
+            else if(!strcmp("id" ,op1))
+            {
+                if (strlen(op2) != 9)
                 {
-                    printf("Erorr : mising filds.. cont add data to database\n") ;
-                    break;
-                }
-                
-                for (i = 0; i < strlen(exp) -1 ; i++)
-                {
-                    c = exp[i] ;
-                    if(c == '=') 
-                    {
-                        break;
-                    }
-                }
-                
-                if ( i == strlen(exp)-1)
-                {
-                    printf("Error : invalid operator %c . options : > , < = , != ", c) ;
-                    break;
-                } 
-                
-                sscanf(exp,"%19[^=] %49[^\t]" ,op1 ,op2);
-                op2[0] = '\t' ;
-                trim(op1) ;
-                trim(op2) ;
-
-                if(!strcmp("first name" ,op1))
-                {
-                   new->first_name = strdup(op2)  ;
-                   all_filds |= FIRST_NAME;
-                }
-                else if (!strcmp("second name" ,op1))
-                {
-                   new->second_name = strdup(op2) ;
-                   all_filds |= SECOND_NAME;
-                }
-                else if(!strcmp("id" ,op1))
-                {
-                   new->id = atoi(op2) ;
-                   all_filds |= ID ;
-                }
-                else if(!strcmp("phone" ,op1))
-                {
-                   strcpy(new->phone,op2) ;
-                   all_filds |= POHNE ;
-                }
-                else if(!strcmp("debt" ,op1))
-                {
-                   new->dept_sum = atof(op2) ;
-                   all_filds |= DEBT ;
-                }
-                else if(!strcmp("date" ,op1))
-                {
-                   strcpy(new->last_date,op2) ;
-                   all_filds |= DATE ;
-                }
-                else
-                {
-                    printf("Error Unknown type %s\n please try again.\n" ,op1) ;
-                    break;
-                }    
-                exp = strtok(NULL,d) ;
-           }
-           if(all_filds == 255)
-           {
-                show_one(new) ;
-                int x = set_new(&db_head, new ,0) ;
-                if(x > -1)
-                {
-                    fprintf(file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id ,new->phone ,new->dept_sum ,new->last_date) ;
-                }
-                if (x != 0)
-                {
+                    af_pars.q_type = ERROR ;
+                    sprintf(af_pars.error_str ,"Error : id must be 9 numbers %s\n please try again.\n" ,op1) ;
                     free_one(new) ;
+                    return af_pars ;
                 }
-           }
-           else
-           {
+                
+                new->id = atoi(op2) ;
+                all_filds |= ID ;
+            }
+            else if(!strcmp("phone" ,op1))
+            {
+                strcpy(new->phone,op2) ;
+                all_filds |= POHNE ;
+            }
+            else if(!strcmp("debt" ,op1))
+            {
+                new->dept_sum = atof(op2) ;
+                all_filds |= DEBT ;
+            }
+            else if(!strcmp("date" ,op1))
+            {
+                strcpy(new->last_date,op2) ;
+                all_filds |= DATE ;
+            }
+            else
+            {
+                af_pars.q_type = ERROR ;
+                sprintf(af_pars.error_str ,"Error : Unknown fild %s\n please try again.\n" ,op1) ;
                 free_one(new) ;
-                for (i = 0; i < FILD_COUNT; i++)
-                {
-                    if (!(all_filds & fld[i]))
-                    {
-                        printf("mising : %s\n" ,fild_nams[i]) ;
-                    }
-                    
-                } 
-           }  
+                return af_pars ;
+            }    
+            exp = strtok(NULL,d) ;
+        }
+
+        if(all_filds == 255)
+        {
+            af_pars.q_type = SET ;
+            af_pars.new = new ;    
         }
         else
         {
-            printf("Unknown type %s\n" ,op1) ;
-        }
+            free_one(new) ;
+            af_pars.q_type = ERROR ;
+            strcpy(af_pars.error_str,"Incorrect data entry\n\t") ;
+            for (i = 0; i < FILD_COUNT; i++)
+            {
+                if (!(all_filds & fld[i]))
+                {
+                    sprintf(af_pars.error_str + strlen(af_pars.error_str),"mising : %s\n" ,fild_nams[i]) ;
+                } 
+            } 
+        }  
+    }   
+    else if(!strcmp(q_type,"print"))
+    {
+        af_pars.q_type = PRINT ;
     }
-    fclose(file) ;
-    free_db(db_head) ;
+    else if (x < 2)
+    {
+        af_pars.q_type = ERROR ;
+        strcpy(af_pars.error_str,"invalid syntsx!. syntax: COMAND < FILD > < OPERATOR(>,<,=,!=)> <PARAMETER>\n") ;
+    }
+    else
+    {
+        af_pars.q_type = ERROR ;
+        sprintf(af_pars.error_str,"Unknown type %s\n" ,op1) ;
+    }
+    return af_pars ;
 }
-
-

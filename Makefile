@@ -1,8 +1,8 @@
-main: main.o store.o store_db.o
-	gcc -g main.o store.o store_db.o -o main
+main_local: main_local.o store.o store_db.o string_handl.o
+	gcc -g main_local.o store.o store_db.o string_handl.o -o main_local
 
-main.o: main.c
-	gcc -Wall -g -c main.c
+main_local.o: main_local.c
+	gcc -Wall -g -c main_local.c
 
 store.o: store.c
 	gcc -Wall -g -c store.c
@@ -10,11 +10,13 @@ store.o: store.c
 store_db.o: store_db.c
 	gcc -Wall -g -c store_db.c
 
-clean:
-	rm -f *.o main
+string_handl.o : string_handl.c
+	gcc -Wall -g -c string_handl.c	
 
+clean:
+	rm -f *.o main_local
 run:
-	./main debts.CSV
+	./main_local debts.CSV
 
 debug:
-	gdb --args ./main debts.CSV
+	gdb --args ./main_local debts.CSV

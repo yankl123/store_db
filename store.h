@@ -1,7 +1,7 @@
 #ifndef STORE_H
 #define STORE_H
 #define  FILD_COUNT 6
-
+#define BUFER_SIZE 1024
 enum filds{
     FIRST_NAME    =  (1 << 0),
     SECOND_NAME   =  (1 << 1),
@@ -18,9 +18,9 @@ typedef struct client {
     float dept_sum ;
     char last_date[12] ; 
     struct client *next ;
-
 }client;
-int valid_all(client *clt ,int line) ;
+
+int valid_all(client *clt ,int line,char *er_buf) ;
 int compair_fname(client *node ,char *name) ;
 int compair_sname(client *node ,char *what) ;
 int compair_id(client *node ,char *what);
