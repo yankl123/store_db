@@ -3,11 +3,11 @@
     "store_db"
 
 #defenition
-    hendl store debts 
+    handl store debts 
 #language
     c
 ####################################################
-#arcitecture 
+#architecture 
     store.h :
         Engaged in philosophy of store : data struct ,compair data and validate 
 #       revealing sevaral functions to store.db (signature)
@@ -32,17 +32,29 @@
 #
         /\
         ||
-#       main:
+#       main_local:
             intial database 
             user interface
+
+#       you can compile the progrem as server and client 
+
+        main_server.c:
+            intial database 
+            user network interface
+
+        client.c :
+            the client aplication 
 #       debts.CSV
             the database file
 
-#   how to use
-#       make : compile basic
-#       make run : run
-#       make debug : debug with gdb
-#       clean : clean all object file       
+#   how to use :
+#       make main_local : compile local aplication option (without network)
+#       make run_local  : run local option
+#       make run server : run server-client option 
+#       make run client : run client progrem to simulate the progrem (after run derver..)
+#       clean : clean all object file    
+#       see more options in makfile..
+#         
 
 
     
