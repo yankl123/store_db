@@ -2,4 +2,6 @@
 .vscode
 main_local
 main_server
+main_local
+client
 wget-log
