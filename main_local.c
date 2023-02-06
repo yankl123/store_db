@@ -4,7 +4,7 @@ void print_buf(char *buf ,void *props)
 {
     if (!props)
     {
-        puts(buf) ;
+        printf("%s",buf) ;
     }
 }
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv)
    
     puts("#############################################################################################################") ;
     
-    sprintf(header,"%-25s %-25s %-15s %-15s %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
+    sprintf(header,"%-25s %-25s %-15s %-15s  %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
     strcpy(bufer,header) ;
     show_db(db,bufer,print_buf,NULL) ;
     print_buf(bufer,NULL) ;
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
         {
             case SELECT:
                 strcpy(bufer,header) ;
-                db_select(db,ap.sp,print_buf,bufer,NULL) ;
+                show_select(db,ap.sp,bufer,print_buf,NULL) ;
                 break;
             case SET:
                 x = set_new(&db,ap.new,0,bufer) ;

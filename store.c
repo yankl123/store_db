@@ -23,90 +23,57 @@ unsigned int date_code(const char *date_string)
     {
         return 0 ;
     }
-
     date |= yare << 9 ;
     date |= month << 5 ;
     date |= day ; 
     return date ;
 }
 
-int compair_fname(client *node ,char *what)
+int compair_node(client *node ,char *what ,enum filds fild)
 {
-    int x = strcmp(node->first_name,what) ;
-    if (x == 0)
+    float x ;
+    switch (fild)
     {
-        return x ;
-    }
-    return (x > 0) ? 1 : -1 ;
-}
-
-int compair_sname(client *node ,char *what)
-{
-    int x = strcmp(node->second_name,what) ;
-    if (x == 0)
-    {
-        return x ;
-    }
-    return (x > 0) ? 1 : -1 ;
-}
-
-int compair_id(client *node ,char *what)
-{
-    int id = atoi(what) ;
-    int x = node->id - id ;
-    if (x == 0)
-    {
-        return 0;
-    }
-    return (x > 0) ? 1 : -1 ;
-}
-
-int compair_phone(client *node ,char *what)
-{
-    int x = strcmp(node->phone,what) ;
-    if (x == 0)
-    {
-        return x ;
-    }
-    return (x > 0) ? 1 : -1 ;
-}
-
-int compair_debt(client *node ,char *what)
-{
-    float debt = atof(what) ;
-    float x = node->dept_sum - debt ;
-    if (x == 0)
-    {
-        return 0;
-    }
-    return (x > 0) ? 1 : -1 ;
-}
-
-int compair_date(client *node ,char *what)
-{
-    unsigned int x = date_code(node->last_date) ;
-    unsigned int y = date_code(what) ;
-
-    if (x == y)
-    {
+    case FIRST_NAME:
+        return strcmp(node->first_name ,what) ;
+        break;
+     case SECOND_NAME:
+        return strcmp(node->second_name ,what) ;
+        break;
+     case ID:
+        return node->id - atoi(what) ;
+        break;
+     case POHNE:
+        return strcmp(node->phone ,what) ;
+        break;
+     case DEBT:
+        x = node->dept_sum - atof(what) ;
+        if (!x)
+        {
+            return 0 ;
+        }
+        return x < 0 ? -1 : 1 ;
+        break;
+    case DATE:
+        return ((int)date_code(node->last_date) - (int)date_code(what)) ;
+    default:
         return 0 ;
+        break;
     }
-    return (x < y) ?  -1 : 1 ;
 }
-int incondition(client *node,char *what ,int(*compair)(client*,char*) ,char c) 
+int incondition(client *node,char *what,char c,enum filds fild) 
 {
-    int result ;
-    result = compair(node,what) ;
+    int result = compair_node(node,what,fild) ;
     switch (c)
     {
     case '=':
         return result == 0 ? 1 : 0;
         break;
     case '<':
-        return result == -1 ? 1 : 0;
+        return result < 1 ? 1 : 0;
         break;
     case '>':
-        return result == 1 ? 1 : 0;
+        return result > 0 ? 1 : 0;
         break;
     case '!':
         return result != 0 ? 1 : 0;
@@ -135,7 +102,7 @@ unsigned int valid_name(char *name)
 {
     int len = strlen(name) ;
     char shtuyot[45] ;
-    sscanf(name,"%[^\'^\"^%^{^}^;^[^]\\^?^=^]",shtuyot) ;
+    sscanf(name,"%[^\'^\"^%^{^}^;^[^]\\^?^=^+^#^^]",shtuyot) ;
     if (len > strlen(shtuyot))
     {
        return 0 ;

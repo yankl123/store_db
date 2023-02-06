@@ -171,80 +171,29 @@ void show_db(client *head,char *buf ,void(*target)(char*,void*) ,void *props)
     }
 }
 
-void show_if(client *head ,select_props sp,int(*compair)(client *node,char *oprand),char *buf ,void(*target)(char*,void*),void *props)
+void show_select(client *head,select_props sp,char *buf,void(*target)(char*,void*),void *props)
 {
     int x ;
     int found = 0 ;
-    while (head)
+    if (sp.fild != DEBT || sp.operator == '!')
     {
-        x = incondition(head,sp.option,compair,sp.operator) ;
-        if(x)
+        while (head)
         {
-            found = 1 ;
-            insert_to_buf(head,buf,target,props) ;
-        }
-        head = head->next ;
-    } 
-    if(!found)
-    {
-        strcat(buf,"not found\n") ;
-    }
-}
-
-void orgenize_db(FILE *file,client **db_head)
-{
-    client *head = NULL;
-    int counter = 0 ;
-    while (1)
-    {
-        client *new = NULL ;
-        char line[300] = {0};
-       
-        if(!fgets(line, sizeof(line), file))
-		{
-			break;
-		}
-        lower(line) ;
-        counter ++ ;
-        new = parse(line,counter) ;
-        if(new)
-        {
-            int x =  set_new(&head,new,counter,NULL);
-            if (x != 0)
+            x = incondition(head,sp.option,sp.operator,sp.fild) ;
+            if(x)
             {
-                free_one(new) ;
+                found = 1 ;
+                insert_to_buf(head,buf,target,props) ;
             }
+            head = head->next ;
+        } 
+        if(!found)
+        {
+            strcat(buf,"not found\n") ;
         }
     }
-    *db_head = head ;
-} 
-
-void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *buf ,void *props)
-{
-    int found = 0 ;
-    switch (sp.fild)
+    else
     {
-    case FIRST_NAME:
-        show_if(head,sp,compair_fname,buf,target,props) ;
-        break;
-    case SECOND_NAME:
-        show_if(head,sp,compair_sname,buf,target,props) ;
-        break;  
-    case ID:
-        show_if(head,sp,compair_id,buf,target,props) ;
-        break;
-    case POHNE:
-        show_if(head,sp,compair_phone,buf,target,props) ;
-        break;   
-    case DATE:
-        show_if(head,sp,compair_date,buf,target,props) ;
-        break;
-    case DEBT: //slightly long but save run time...
-        if(sp.operator == '!')
-        {
-            show_if(head,sp,compair_debt,buf,target,props) ;
-            break;
-        }
         while (head)
         {
             float dbt = (float)atof(sp.option) ;
@@ -252,7 +201,7 @@ void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *bu
             {
                 if (sp.operator == '>')
                 {
-                    show_db(head,buf,target,NULL) ;
+                    show_db(head,buf,target,props) ;
                 }
                 else
                 {
@@ -273,12 +222,12 @@ void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *bu
                     } 
                     break;
                 }
-                insert_to_buf(head,buf,target,NULL) ;
+                insert_to_buf(head,buf,target,props) ;
                 found = 1 ;
             }
             else if((sp.operator == '<'))
             {
-                insert_to_buf(head,buf,target,NULL) ;
+                insert_to_buf(head,buf,target,props) ;
                 found = 1 ;
             }
             head = head->next ;
@@ -287,11 +236,43 @@ void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *bu
                 strcat(buf,"not found\n") ;
             }   
         }
-        break;
-    default: 
-        break;
     }
+    
 }
+
+void orgenize_db(FILE *file,client **db_head)
+{
+    client *head = NULL;
+    int counter = 0 ;
+    while (1)
+    {
+        client *new = NULL ;
+        char line[300] = {0};
+       
+        if(!fgets(line, sizeof(line), file))
+		{
+			break;
+		}
+        if (line[0] == '\n' || line[0] == ' ')
+        {
+            continue;
+        }
+        
+        lower(line) ;
+        counter ++ ;
+        new = parse(line,counter) ;
+        if(new)
+        {
+            int x =  set_new(&head,new,counter,NULL);
+            if (x != 0)
+            {
+                free_one(new) ;
+            }
+        }
+    }
+    *db_head = head ;
+} 
+
 after_pars parse_query(char *q_str)
 {
     after_pars af_pars = {} ;
@@ -360,7 +341,9 @@ after_pars parse_query(char *q_str)
         }
         if (i == FILD_COUNT)
         {
-            printf("Error: Unknown type %s\n" ,op1) ;
+            af_pars.q_type = ERROR ;
+            sprintf(af_pars.error_str,"Error: Unknown type %s\n" ,op1) ;
+            return af_pars ;
         }
     }
     else if(!strcmp(q_type,"set"))

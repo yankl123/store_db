@@ -14,7 +14,6 @@ typedef struct Con_props
 typedef struct Target_props
 {
     int sock ;
-    char *buf ;
     int *status ;
     
 }target_props;
@@ -39,9 +38,8 @@ void *conn_handler(void *args)
     int n ,r,x ,send_status;
     r = 0 ;
     after_pars ap = {} ;
-    sprintf(header,"%-25s %-25s %-15s %-15s %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
+    sprintf(header,"%-25s %-25s %-15s  %-15s %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
     target_props tarps ={
-        .buf = buffer ,
         .sock = conps->sock ,
         .status = &send_status
         } ;
@@ -71,7 +69,7 @@ void *conn_handler(void *args)
         {
             case SELECT:
                 strcpy(buffer,header) ;
-                db_select(*db,ap.sp,send_buf,buffer,&tarps) ;
+                show_select(*db,ap.sp,buffer,send_buf,&tarps) ;
                 if (send_status < 0)
                 {
                     perror("Server error sending data");
