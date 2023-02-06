@@ -66,12 +66,6 @@ void *conn_handler(void *args)
     } 
     printf("Server received\n: %s\n", query_string);
 
-    if(!strcmp(query_string,"shutdown p@ssword"))
-    {
-        fclose(conps->file) ;
-        free_one(*db) ;
-        goto exit ;
-    }
     ap =  parse_query(query_string) ;
     switch (ap.q_type)
         {
