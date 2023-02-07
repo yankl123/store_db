@@ -48,7 +48,7 @@
 #        client.c :
 #           the client aplication 
 #       debts.CSV
-            the database file
+#          the database file
 
 #   how to use :
 #       make main_local : compile local aplication option (without network)
@@ -58,9 +58,3 @@
 #       make run client : run client progrem to simulate the progrem (after run derver..)
 #       clean : clean all object file and run files 
 #       see more options in makfile..
-
-    
-
-
-    
-
