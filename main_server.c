@@ -33,7 +33,7 @@ void *conn_handler(void *args)
     char query_string[BUFER_SIZE] = {0};
     char buffer[BUFER_SIZE] = {0};
     char header[120] = {0} ;
-    char *fild_nams[6] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DATE" ,"DEBT"} ;
+    char *fild_nams[6] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DEBT","DATE" } ;
     con_props *conps = (con_props*)args ;
     int n ,r,x ,send_status;
     r = 0 ;

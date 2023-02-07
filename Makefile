@@ -37,6 +37,9 @@ run_server:
 run_client:
 	./client 127.0.0.1 12345
 
+server_off:
+	pkill main_server
+
 debug_local:
 
 	gdb --args ./main_local debts.CSV
@@ -46,3 +49,4 @@ debug_server:
 
 debug_client :
 	gdb --args ./client 127.0.0.1 12345
+

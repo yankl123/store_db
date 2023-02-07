@@ -1,0 +1,7 @@
+Reducing all comparison functions to one function
+in condition function dosn't need function pointer
+Canceling the db_select function
+The show if function is named show_select
+The code is simpler and more efficient
+
+
