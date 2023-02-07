@@ -17,7 +17,7 @@
 #       implementing all function to handl data
 
 #         string_handl.c
-  /\      string_handl.h 
+# /\      string_handl.h 
   ||         /\
   ||_________||        
 #       store_db.c:
@@ -33,7 +33,8 @@
 #        \_main_local.c:
 #           initial database using "orgenize_db" function
 #           user interface
-            use "show_db" , "show_select" functions
+#           use "parse_query", "show_db" ,"show_select" ,"set_new" functions
+#           use "show_db" , "show_select" functions
 #           define the "print_buf" function 
 
 #           you can compile the progrem as server and client 
@@ -41,8 +42,8 @@
         ||
 #       main_server.c:
 #           initial database using "orgenize_db" function
-#           user network interface using "parse_query" function 
-#           used "show_db" , "show_select" functions
+#           user network interface 
+#           use "parse_query", "show_db" , "show_select" ,,"set_new" functions
 #           define the "send_buf" function 
 
 #        client.c :
