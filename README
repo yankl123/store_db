@@ -27,7 +27,7 @@
         \/ 
 
 #       store_db.h:
-                revealing the database functions to main_local / main_server (signature)
+                revealing the database functions to main_local (signature)
         /\
         ||
         \_main_local.c:
