@@ -21,11 +21,5 @@ typedef struct client {
 }client;
 
 int valid_all(client *clt ,int line,char *er_buf) ;
-int compair_fname(client *node ,char *name) ;
-int compair_sname(client *node ,char *what) ;
-int compair_id(client *node ,char *what);
-int compair_phone(client *node ,char *what);
-int compair_date(client *node ,char *what) ;
-int compair_debt(client *node ,char *what) ;
-int incondition(client *node,char *what ,int(*compair)(client *node,char *oprand) ,char c) ;
+int incondition(client *node,char *what,char c,enum filds fild)  ;
 #endif

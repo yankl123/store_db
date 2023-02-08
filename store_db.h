@@ -34,7 +34,7 @@ typedef struct after_pars
 int set_new(client **head ,client *new ,int line,char *er_buf) ;
 void orgenize_db(FILE *file,client **db_head);
 void show_db(client *head,char *buf ,void(*target)(char*,void*) ,void *props) ;
-void db_select(client *head ,select_props sp,void(*target)(char*,void*),char *buf ,void *props) ;
+void show_select(client *head,select_props sp,char *buf,void(*target)(char*,void*),void *props) ;
 void free_one(client *clt);
 void free_db(client *node) ;
 after_pars parse_query(char *q_str) ;
@@ -42,5 +42,4 @@ after_pars parse_query(char *q_str) ;
 
 
 #endif
-
 
