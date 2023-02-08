@@ -70,9 +70,9 @@
                 char error_str[200] 
                 }
         }"                              the progrem works acording to what returned in "atter pars"
-                                        in case the progrem need returen database data int passesd as arguments
-                                        the target function and the buffer as argumenet to the "show_db" or "show_select"  function
-                                        ("print_buf" for stdin "send_buf" for network) if the buufer is full 
+                                        in case the progrem need returen database data it passesd as arguments
+                                        the target function and the buffer as argumenet to the "show_db" or "show_select" 
+                                        function ("print_buf" for stdin "send_buf" for network) if the buufer is full 
                                         the function execute the target function and continue
 #       how to use :
                 make main_local : compile local aplication option (without network)
