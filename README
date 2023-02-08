@@ -56,8 +56,8 @@
                 initial database 
                 input user 
                 [query string] --> parse_query func \
-                                                |
-                ["after_pars" struct]    <----|
+                                                     |
+                ["after_pars" struct]           <----|
                    ||
                    \/
         "struct after_pars
