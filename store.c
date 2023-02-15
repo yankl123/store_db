@@ -70,7 +70,7 @@ int incondition(client *node,char *what,char c,enum filds fild)
         return result == 0 ? 1 : 0;
         break;
     case '<':
-        return result < 1 ? 1 : 0;
+        return result < 0 ? 1 : 0;
         break;
     case '>':
         return result > 0 ? 1 : 0;
