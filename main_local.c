@@ -10,6 +10,12 @@ void print_buf(char *buf ,void *props)
 
 int main(int argc, char **argv)
 {
+    if (argc < 2)
+    {
+        puts("usage : ./main_local <file_neme>") ;
+        return -1 ;
+    }
+    
     FILE *file ;
     file = fopen(argv[1],"a+") ;
     client *db = NULL;
