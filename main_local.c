@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     int work = 1 ;
     char buffer[BUFFER_SIZE] = {0} ;
     int x ;
-    char *field_names[] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DATE" ,"DEBT"} ;
+    char *field_names[] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DEBT","DATE"} ;
     int points[] = {26,26,17,16,16,15}; 
     
     char header[120] = {0} ;

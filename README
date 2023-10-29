@@ -1,79 +1,51 @@
+# Project Name: store_db
 
-#project name:
-    "store_db"
-#description
-    handl store debts 
-#language
-    c
-####################################################
-##architecture 
-#  store.h :
-        Engaged in philosophy of store : data struct ,compair data and validate 
-        revealing "incondition" and "all_valid" functions to store.db (signature) 
+## Description:
+Handles store debts.
 
-        /\
-        ||
-#       store.c:
-                implementing all function to handl data
+## Language:
+C
 
-#         string_handl.c
-# /\      string_handl.h 
-  ||         /\
-  ||_________||        
-#       store_db.c:
-                "orgenise_db" function build the database reading from debts.csv, useing "parse" and"set_new" functions
-                "parse_query" function parse query string and returen "after_pars" struct        
-        ||  
-        \/ 
+## Architecture:
 
-#       store_db.h:
-                revealing the database functions to main_local / main_server (signature)
-        /\
-        ||
-        \_main_local.c:
-                initial database(linked list)using "orgenize_db" function
-                user interface
-                use "parse_query", "show_db" ,"show_select" ,"set_new" functions
-                use "show_db" , "show_select" functions
-                define the "print_buf" function 
+### store.h:
+Engaged in the philosophy of store: data structure, data comparison, and validation. It reveals "incondition" and "all_valid" functions to store.db with their signatures.
 
-                you can compile the progrem as server and client 
-        /\
-        ||
-#       main_server.c:
-                initial database using "orgenize_db" function
-                user network interface 
-                use "parse_query", "show_db" , "show_select" ,,"set_new" functions
-                define the "send_buf" function 
+### store.c:
+Implements all functions to handle data.
 
-#       client.c :
-                the client aplication 
-#       debts.CSV
-                the database file
+### string_handl.c
+### string_handl.h 
+Handles string operations.
 
-## flow
-        [main progrem]
-                initial database 
-                input user 
-                [query string] --> parse_query func \
-                                                     |
-                ["Task" struct]           <----|
-                   ||
-                   \/
-        "struct Task
-        {
-                enum Q_TYPE q_type  ------------> [PRINT|SELECT|SET|ERROR|QUIT]
-                union task_data data ;      
-        }"                              the progrem works acording to what returned in "atter pars"
-                                        in case the progrem need returen database data it passesd as arguments
-                                        the target function and the buffer as argumenet to the "show_db" or "show_select" 
-                                        function ("print_buf" for stdin "send_buf" for network) if the buufer is full 
-                                        the function execute the target function and continue
-#       how to use :
-                make main_local : compile local aplication option (without network)
-                make main_server: compile derver aplication option 
-                make run_local  : run local option
-                make run server : run server option 
-                make run client : run client progrem to simulate the progrem (after run derver..)
-                clean : clean all object file and run files 
-                see more options in makefile..
+### store_db.c:
+- `orgenise_db` function builds the database by reading from debts.csv, using "parse" and "set_new" functions.
+- `parse_query` function parses the query string and returns a "Task" struct.
+
+### store_db.h:
+Reveals the database functions to main_local with their signatures.
+
+### main_local.c:
+Initializes the database (linked list) using the `orgenize_db` function, provides the user interface. Utilizes functions like `parse_query`, `show_db`, `show_select`, `set_new`, `show_db`, `show_select`. Defines the `print_buf` function.
+
+### debts.CSV:
+The database file.
+
+## Flow:
+1. [Main Program]
+    - Initializes the database.
+    - Takes user input.
+2. [Query String] --> `parse_query` function
+    - Returns ["Task" struct]
+        - enum Q_TYPE [PRINT|SELECT|SET|ERROR|QUIT]
+        - Union:
+            - `select_props sp`
+            - `client *new`
+            - `char error_str[200]`
+    - The program works according to what is returned in "after parse". If the program needs to return database data, it is passed as arguments to the target function and the buffer is passed as an argument to `show_db` or `show_select` function. If the buffer is full, the function executes the target function and continues.
+
+## How to Use:
+- `make main_local`: Compile the program.
+- `make run`: Run the application.
+- `make clean`: Clean all object files and run files.
+- For more options, refer to the Makefile.
