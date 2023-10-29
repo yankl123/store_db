@@ -30,15 +30,23 @@ void send_buf(char *buf ,void *props)
 
 void *conn_handler(void *args)
 {
-    char query_string[BUFER_SIZE] = {0};
-    char buffer[BUFER_SIZE] = {0};
+    char query_string[BUFFER_SIZE] = {0};
+    char buffer[BUFFER_SIZE] = {0};
     char header[120] = {0} ;
-    char *fild_nams[6] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DEBT","DATE" } ;
+    char *field_names[] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DEBT","DATE" } ;
+    int points[] = {26,26,17,16,16,15}; 
     con_props *conps = (con_props*)args ;
     int n ,r,x ,send_status;
     r = 0 ;
-    after_pars ap = {} ;
-    sprintf(header,"%-25s %-25s %-15s  %-15s %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
+    Task task = {} ;
+
+    for (int i = 0 ,point = 0; i < FIELD_COUNT; i++)
+    {
+        strcpy(header + point,field_names[i]) ;
+        memset(header + point + strlen(field_names[i]),' ', points[i] - strlen(field_names[i])) ;
+        point += points[i] ;
+    }
+    printf("\n") ;
     target_props tarps ={
         .sock = conps->sock ,
         .status = &send_status
@@ -50,7 +58,7 @@ void *conn_handler(void *args)
     
     while (1)
     {
-        n = recv(new_sock, query_string + r, BUFER_SIZE - r, 0);
+        n = recv(new_sock, query_string + r, BUFFER_SIZE - r, 0);
         if (n < 0)
         {
             perror("Server error receiving data");
@@ -64,12 +72,12 @@ void *conn_handler(void *args)
     } 
     printf("Server received\n: %s\n", query_string);
 
-    ap =  parse_query(query_string) ;
-    switch (ap.q_type)
+    task =  parse_query(query_string) ;
+    switch (task.q_type)
         {
             case SELECT:
                 strcpy(buffer,header) ;
-                show_select(*db,ap.sp,buffer,send_buf,&tarps) ;
+                show_select(*db,task.data.sp,buffer,send_buf,&tarps) ;
                 if (send_status < 0)
                 {
                     perror("Server error sending data");
@@ -77,16 +85,17 @@ void *conn_handler(void *args)
                 }
                 break;
             case SET:
-                x = set_new(db,ap.new,0,buffer) ;
+                x = set_new(db,task.data.new,0,buffer) ;
                 if(x > -1)
-                {
-                    fprintf(conps->file,"%s,%s,%d,%s,%f,%s\n",ap.new->first_name,ap.new->second_name,ap.new->id,
-                    ap.new->phone,ap.new->dept_sum,ap.new->last_date) ;
+                {   
+                    client *new = task.data.new ;
+                    fprintf(conps->file,"%s,%s,%d,%s,%f,%s\n",new->first_name,new->second_name,new->id,
+                    new->phone,new->dept_sum,new->last_date) ;
                     strcpy(buffer,"comand completed succesfuly\n") ;
                 }
                 if (x == -1)
                 {
-                    free_one(ap.new) ;
+                    free_one(task.data.new) ;
                 }
                 break;
             case PRINT:
@@ -99,7 +108,7 @@ void *conn_handler(void *args)
                 }
                 break;
             case ERROR :
-                strcpy(buffer,ap.error_str) ;
+                strcpy(buffer,task.data.error_str) ;
                 break;
             default:
                 break;

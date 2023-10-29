@@ -20,6 +20,12 @@ void trim(char *s)
         s[j] = '\0' ;
         j-- ;
     } 
+    
+    if (i == 0)
+    {
+        return ;
+    }
+    
     tmp = i ;
     i = 0 ;
     x = strlen(s) ;

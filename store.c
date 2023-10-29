@@ -29,10 +29,10 @@ unsigned int date_code(const char *date_string)
     return date ;
 }
 
-int compair_node(client *node ,char *what ,enum filds fild)
+int compair_node(client *node ,char *what ,enum fields field)
 {
     float x ;
-    switch (fild)
+    switch (field)
     {
     case FIRST_NAME:
         return strcmp(node->first_name ,what) ;
@@ -61,9 +61,9 @@ int compair_node(client *node ,char *what ,enum filds fild)
         break;
     }
 }
-int incondition(client *node,char *what,char c,enum filds fild) 
+int incondition(client *node,char *what,char c,enum fields field) 
 {
-    int result = compair_node(node,what,fild) ;
+    int result = compair_node(node,what,field) ;
     switch (c)
     {
     case '=':
@@ -160,7 +160,7 @@ unsigned int valid_debt(float debt)
 int valid_all(client *clt ,int line,char *err_buf)
 {
     unsigned char all_valid = (3 << 6) ; //11000000
-    enum filds fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DEBT,DATE} ;
+    enum fields fld[6] = {FIRST_NAME,SECOND_NAME,ID,POHNE,DEBT,DATE} ;
     char *ermsg[6] = {
         "\tinvalide first name : Strange letters\n",
         "\tinvalide second name : Strange letters\n",
@@ -179,14 +179,14 @@ int valid_all(client *clt ,int line,char *err_buf)
     all_valid |= valid_debt(clt->dept_sum) ;
     all_valid |= valid_date(clt->last_date) ;
   
-    if (all_valid == 255)
+    if (all_valid == ORDERLY)
     {
         return 1 ;
     }
     else
     {
         sprintf(error_str,"found error in data of line %d\n" ,line) ;
-        for (int i = 0; i < FILD_COUNT; i++)
+        for (int i = 0; i < FIELD_COUNT; i++)
         {
             if(!(all_valid & fld[i]))
             {

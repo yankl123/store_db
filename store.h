@@ -1,8 +1,9 @@
 #ifndef STORE_H
 #define STORE_H
-#define  FILD_COUNT 6
-#define BUFER_SIZE 1024
-enum filds{
+#define  FIELD_COUNT 6
+#define BUFFER_SIZE 1024
+#define ORDERLY 255
+enum fields{
     FIRST_NAME    =  (1 << 0),
     SECOND_NAME   =  (1 << 1),
     ID            =  (1 << 2),
@@ -21,5 +22,5 @@ typedef struct client {
 }client;
 
 int valid_all(client *clt ,int line,char *er_buf) ;
-int incondition(client *node,char *what,char c,enum filds fild)  ;
+int incondition(client *node,char *what,char c,enum fields field)  ;
 #endif

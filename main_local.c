@@ -11,68 +11,92 @@ void print_buf(char *buf ,void *props)
 int main(int argc, char **argv)
 {
     FILE *file ;
-    file = fopen(argv[1],"a+") ;
     client *db = NULL;
     int work = 1 ;
-    orgenize_db(file,&db) ;
-    char bufer[1024] = {0} ;
+    char buffer[BUFFER_SIZE] = {0} ;
     int x ;
-    char *fild_nams[6] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DATE" ,"DEBT"} ;
+    char *field_names[] ={"FIRST_NAME","SECOND_NAME" ,"ID" ,"PHONE" ,"DATE" ,"DEBT"} ;
+    int points[] = {26,26,17,16,16,15}; 
+    
     char header[120] = {0} ;
+    file = fopen(argv[1],"a+") ;
+    if (!file)
+    {
+        return -1 ;
+    }
+    
+    if (argc < 2)
+    {
+        puts("Error! usage : ./main_local <file_neme>") ;
+        return -1 ;
+    }
+
+    
+    orgenize_db(file,&db) ;
     printf("*****************************************WELCOM TO STORE DATABASE********************************************\n\n") ;
    
-    puts("#############################################################################################################") ;
+    puts("############################################################################################################") ;
     
-    sprintf(header,"%-25s %-25s %-15s %-15s  %-15s %s\n\n" ,fild_nams[0],fild_nams[1],fild_nams[2],fild_nams[3],fild_nams[4],fild_nams[5]) ;
-    strcpy(bufer,header) ;
-    show_db(db,bufer,print_buf,NULL) ;
-    print_buf(bufer,NULL) ;
-    memset(bufer,0,BUFER_SIZE) ;
+    for (int i = 0 ,point = 0; i < FIELD_COUNT; i++)
+    {
+        strcpy(header + point,field_names[i]) ;
+        memset(header + point + strlen(field_names[i]),' ', points[i] - strlen(field_names[i])) ;
+        point += points[i] ;
+    }
+    strcat(header,"\n\n") ;
+    strcpy(buffer,header) ;
+
+    show_db(db,buffer,print_buf,NULL) ;
+    print_buf(buffer,NULL) ;
+    memset(buffer,0,BUFFER_SIZE) ;
     
     puts("--------------------------------------------Enter your comand------------------------------------------------") ;
     while (work)
     {
-        char query_string[BUFER_SIZE] = {0};
-        after_pars ap = {} ;
+        char query_string[BUFFER_SIZE] = {0};
+        Task task = {} ;
         printf("Please enter the comand :\n-->") ;
         
         fgets(query_string,300,stdin) ;
-        ap =  parse_query(query_string) ;
-        switch (ap.q_type)
+        task =  parse_query(query_string) ;
+        switch (task.q_type)
         {
             case SELECT:
-                strcpy(bufer,header) ;
-                show_select(db,ap.sp,bufer,print_buf,NULL) ;
+                strcpy(buffer,header) ;
+                show_select(db,task.data.sp,buffer,print_buf,NULL) ;
                 break;
             case SET:
-                x = set_new(&db,ap.new,0,bufer) ;
+                x = set_new(&db,task.data.new,0,buffer) ;
                 if(x > -1)
                 {
-                    fprintf(file,"%s,%s,%d,%s,%f,%s\n",ap.new->first_name,ap.new->second_name,ap.new->id,
-                    ap.new->phone,ap.new->dept_sum,ap.new->last_date) ;
-                    strcpy(bufer,"comand completed succesfuly\n") ;
+                    client *new = task.data.new ;
+                    fprintf(file,"%s,%s,%d,%s,%f,%s\n",
+                    new->first_name,new->second_name,new->id,
+                    new->phone,new->dept_sum,new->last_date) ;
+                    
+                    strcpy(buffer,"comand completed succesfuly\n") ;
                 }
                 if (x == -1)
                 {
-                    free_one(ap.new) ;
+                    free_one(task.data.new) ;
                 }
                 break;
             case PRINT:
-                strcpy(bufer,header) ;
-                show_db(db,bufer,print_buf,NULL) ;
+                strcpy(buffer,header) ;
+                show_db(db,buffer,print_buf,NULL) ;
                 break;
             case ERROR :
-                strcpy(bufer,ap.error_str) ;
+                strcpy(buffer,task.data.error_str) ;
                 break;
             case QUIT:
-                strcpy(bufer,"thank you\n") ;
+                strcpy(buffer,"thank you\n") ;
                 work = 0 ;
                 break;
             default:
                 break;
         }
-        print_buf(bufer,NULL) ;
-        memset(bufer,0,BUFER_SIZE) ;
+        print_buf(buffer,NULL) ;
+        memset(buffer,0,BUFFER_SIZE) ;
     }
     fclose(file) ;
     free_db(db) ;

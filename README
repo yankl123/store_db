@@ -57,18 +57,13 @@
                 input user 
                 [query string] --> parse_query func \
                                                      |
-                ["after_pars" struct]           <----|
+                ["Task" struct]           <----|
                    ||
                    \/
-        "struct after_pars
+        "struct Task
         {
-        enum Q_TYPE q_type  ------------> [PRINT|SELECT|SET|ERROR|QUIT]
-                union                                           
-                {                                       
-                select_props sp   
-                client *new 
-                char error_str[200] 
-                }
+                enum Q_TYPE q_type  ------------> [PRINT|SELECT|SET|ERROR|QUIT]
+                union task_data data ;      
         }"                              the progrem works acording to what returned in "atter pars"
                                         in case the progrem need returen database data it passesd as arguments
                                         the target function and the buffer as argumenet to the "show_db" or "show_select" 
